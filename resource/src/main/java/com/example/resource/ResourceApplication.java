@@ -22,6 +22,7 @@ public class ResourceApplication {
 @ResponseBody
 class MessageController {
 
+	// <.>
 	@GetMapping("/message")
 	Map<String, String> message(Principal principal) {
 		return Map.of("message", "Hello, " + principal.getName() + "!");

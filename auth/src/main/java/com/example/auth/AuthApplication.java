@@ -1,11 +1,8 @@
 package com.example.auth;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -18,59 +15,40 @@ import org.springframework.web.bind.annotation.GetMapping;
 @SpringBootApplication
 public class AuthApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(AuthApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(AuthApplication.class, args);
+	}
 
-    @Bean
-    Customizer<HttpSecurity> httpSecurityCustomizer() {
-        return http -> http //
-                .oauth2AuthorizationServer(configurer -> {
-                    configurer.oidc(Customizer.withDefaults()); //
-                    configurer.deviceAuthorizationEndpoint(Customizer.withDefaults()); //
-                    configurer.deviceVerificationEndpoint(Customizer.withDefaults()); //
-                });
-    }
+	@Bean
+	Customizer<HttpSecurity> httpSecurityCustomizer() {
+		return http -> http //
+			.oauth2AuthorizationServer(configurer -> {
+				configurer.oidc(Customizer.withDefaults()); //
+				configurer.deviceAuthorizationEndpoint(Customizer.withDefaults()); //
+				configurer.deviceVerificationEndpoint(Customizer.withDefaults()); //
+			});
+	}
 
-    @Controller
-    static class SuccessController {
+	@Bean
+	PasswordEncoder passwordEncoder() {
+		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+	}
 
-        @GetMapping ("/")
-        void success (HttpServletResponse response) throws Exception {
-            response.setContentType(MediaType.TEXT_HTML_VALUE);
-            response.getWriter().write("""
-                    <html> 
-                     <head> 
-                      <title> 
-                       [hacker voice]: You're In!
-                      </title>
-                     </head>
-                     <body>
-                      <P> Success!</P>
-                     </body>
-                    </html>
-                    """);
+	@Bean
+	InMemoryUserDetailsManager inMemoryUserDetailsManager(PasswordEncoder passwordEncoder) {
+		return new InMemoryUserDetailsManager(
+				User.withUsername("rob").password(passwordEncoder.encode("pw")).roles("USER").build(),
+				User.withUsername("josh").password(passwordEncoder.encode("pw")).roles("USER").build());
+	}
 
-        }
+}
 
-    }
+@Controller
+class SuccessController {
 
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
-    @Bean
-    InMemoryUserDetailsManager inMemoryUserDetailsManager(PasswordEncoder passwordEncoder) {
-        return new InMemoryUserDetailsManager(
-                User.withUsername("rob")
-                        .password(passwordEncoder.encode("pw"))
-                        .roles("USER").build(),
-                User.withUsername("josh")
-                        .password(passwordEncoder.encode("pw"))
-                        .roles("USER")
-                        .build()
-        );
-    }
+	@GetMapping("/")
+	String success() {
+		return "success";
+	}
 
 }
