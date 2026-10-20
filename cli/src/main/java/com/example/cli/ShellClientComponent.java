@@ -18,13 +18,14 @@ class ShellClientComponent {
 		this.granter = granter;
 	}
 
+	// <.>
 	@Command(description = "get a secured message")
 	String message() throws Exception {
-		var at = this.granter.grant().accessToken();
+		var at = this.granter.grant().accessToken(); // <.>
 		return Objects
 			.requireNonNull(this.http.get()
 				.uri("http://localhost:8081/message")
-				.headers(h -> h.setBearerAuth(at))
+				.headers(h -> h.setBearerAuth(at)) // <.>
 				.retrieve()
 				.body(Message.class))
 			.message();
