@@ -21,10 +21,8 @@ class Granter {
 
 	Granter(InMemoryClientRegistrationRepository repository, RestClient.Builder http) {
 		this.registration = repository.findByRegistrationId("messages"); // <.>
-		this.http = http.defaultHeaders(headers -> {
-			headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-			headers.setBasicAuth(this.registration.getClientId(), this.registration.getClientSecret()); // <.>
-		}).build();
+		this.http = http.defaultHeaders(headers -> headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED)) // <.>
+			.build();
 	}
 
 	Grant grant() throws Exception {

@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,12 +22,17 @@ public class AuthApplication {
 	}
 
 	@Bean
-	Customizer<HttpSecurity> httpSecurityCustomizer() {
+	Customizer<HttpSecurity> httpSecurityCustomizer(RegisteredClientRepository repository,
+			AuthorizationServerSettings settings) {
 		return http -> http //
 			.oauth2AuthorizationServer(configurer -> {
 				configurer.oidc(Customizer.withDefaults()); // <.>
 				configurer.deviceAuthorizationEndpoint(Customizer.withDefaults()); // <.>
 				configurer.deviceVerificationEndpoint(Customizer.withDefaults()); // <.>
+				configurer.clientAuthentication(clientAuthentication -> clientAuthentication // <.>
+					.authenticationConverter(
+							new DeviceClientAuthenticationConverter(settings.getDeviceAuthorizationEndpoint()))
+					.authenticationProvider(new DeviceClientAuthenticationProvider(repository)));
 			});
 	}
 
