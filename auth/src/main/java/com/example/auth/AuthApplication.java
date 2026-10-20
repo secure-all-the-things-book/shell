@@ -23,9 +23,9 @@ public class AuthApplication {
 	Customizer<HttpSecurity> httpSecurityCustomizer() {
 		return http -> http //
 			.oauth2AuthorizationServer(configurer -> {
-				configurer.oidc(Customizer.withDefaults()); //
-				configurer.deviceAuthorizationEndpoint(Customizer.withDefaults()); //
-				configurer.deviceVerificationEndpoint(Customizer.withDefaults()); //
+				configurer.oidc(Customizer.withDefaults()); // <.>
+				configurer.deviceAuthorizationEndpoint(Customizer.withDefaults()); // <.>
+				configurer.deviceVerificationEndpoint(Customizer.withDefaults()); // <.>
 			});
 	}
 
@@ -46,6 +46,7 @@ public class AuthApplication {
 @Controller
 class SuccessController {
 
+	// <.>
 	@GetMapping("/")
 	String success() {
 		return "success";
